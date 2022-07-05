@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'profile/profile_widget.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -28,6 +30,18 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      body: <Widget>[
+        Container(
+          alignment: Alignment.center,
+          child: const Text('Меню'),
+        ),
+        Container(
+          alignment: Alignment.center,
+          child: const Text('Корзина'),
+        ),
+        SafeArea(child: ProfileWidget())
+      ][currentPageIndex],
       bottomNavigationBar: NavigationBar(
         backgroundColor: Colors.white,
         onDestinationSelected: (int index) {
@@ -51,20 +65,6 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
           ),
         ],
       ),
-      body: <Widget>[
-        Container(
-          alignment: Alignment.center,
-          child: const Text('Меню'),
-        ),
-        Container(
-          alignment: Alignment.center,
-          child: const Text('Корзина'),
-        ),
-        Container(
-          alignment: Alignment.center,
-          child: const Text('Page 3'),
-        ),
-      ][currentPageIndex],
     );
   }
 }
