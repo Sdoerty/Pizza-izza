@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'menu/menu_widget.dart';
 import 'profile/profile_widget.dart';
 
 void main() {
@@ -32,10 +33,7 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: <Widget>[
-        Container(
-          alignment: Alignment.center,
-          child: const Text('Меню'),
-        ),
+        SafeArea(child: MenuWidget()),
         Container(
           alignment: Alignment.center,
           child: const Text('Корзина'),
