@@ -158,14 +158,14 @@ class _MenuWidgetState extends State<MenuWidget> {
                                 ),
                                 Container(
                                     padding: EdgeInsets.symmetric(vertical: 7),
-                                    width: 200,
+                                    width: 190,
                                     child: Text(
                                       "томатный соус, моцарелла, базилик, пармезан, еще что-то",
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     )),
                                 Container(
-                                  width: 200,
+                                  width: 190,
                                   child: ElevatedButton(
                                     onPressed: () {},
                                     child: Text('550 ₽'),

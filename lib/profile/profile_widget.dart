@@ -1,17 +1,59 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import '../style/style.dart';
 
-class ProfileWidget extends StatefulWidget {
+class ProfileModel extends ChangeNotifier{
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final _phoneController = TextEditingController();
+
+  Future<String?> signInWithPhone(String phone, BuildContext context) async {
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phone,
+      timeout: Duration(seconds: 60),
+      verificationCompleted: (PhoneAuthCredential credential) async{
+        await _auth.signInWithCredential(credential);
+        UserCredential result = await _auth.signInWithCredential(credential);
+        User? user = result.user;
+        if(user != null){
+          print(user);
+        }else{
+          print("Error");
+        }
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        if (e.code == 'invalid-phone-number') {
+          print('The provided phone number is not valid.');
+        }
+      },
+      codeSent: (String verificationId, int? resendToken) async {
+        String smsCode = 'xxxx';
+        PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: smsCode);
+        await _auth.signInWithCredential(credential);
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
+  }
+}
+
+class ProfileWidget extends StatelessWidget {
   const ProfileWidget({Key? key}) : super(key: key);
 
   @override
-  State<ProfileWidget> createState() => _ProfileWidgetState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+        create: (context) => ProfileModel(),
+        child: ProfileDetailWidget());
+  }
 }
 
-class _ProfileWidgetState extends State<ProfileWidget> {
+class ProfileDetailWidget extends StatelessWidget {
+  const ProfileDetailWidget({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    final model = context.watch<ProfileModel>();
+
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(8.0),
@@ -54,6 +96,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
+                controller: model._phoneController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
                     prefixIcon: Icon(Icons.phone),
@@ -66,7 +109,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               padding: const EdgeInsets.all(8.0),
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  final phone = model._phoneController.text.trim();
+                  model.signInWithPhone(phone, context);
+                },
                 child: Text('Войти'),
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Colors.orange),
@@ -81,3 +127,4 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     );
   }
 }
+
