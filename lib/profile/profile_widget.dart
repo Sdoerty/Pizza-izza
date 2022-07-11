@@ -7,11 +7,12 @@ class ProfileModel extends ChangeNotifier{
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _phoneController = TextEditingController();
   final _codeController = TextEditingController();
+  var userPhoneNumber;
 
   Future<String?> signInWithPhone(String phone, BuildContext context) async {
     await _auth.verifyPhoneNumber(
       phoneNumber: phone,
-      timeout: Duration(seconds: 60),
+      timeout: Duration(seconds: 120),
       verificationCompleted: (PhoneAuthCredential credential) async{
         await _auth.signInWithCredential(credential);
         UserCredential result = await _auth.signInWithCredential(credential);
@@ -23,9 +24,7 @@ class ProfileModel extends ChangeNotifier{
         }
       },
       verificationFailed: (FirebaseAuthException e) {
-        if (e.code == 'invalid-phone-number') {
-          print('The provided phone number is not valid.');
-        }
+        print(e.code);
       },
       codeSent: (String verificationId, int? resendToken) async {
         showDialog(
@@ -55,7 +54,7 @@ class ProfileModel extends ChangeNotifier{
 
                       if(user != null){
                         Navigator.of(context).pop();
-                        print(user.phoneNumber);
+                        userPhoneNumber = user.phoneNumber!;
                       }else{
                         print("Error");
                       }
@@ -89,77 +88,82 @@ class ProfileDetailWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final model = context.watch<ProfileModel>();
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Column(
-                  children: [
-                    Container(
-                        width: 200,
-                        child: Image.asset('assets/pizza_logo.png')),
-                    SizedBox(height: 15),
-                    Text('Вход', style: titleStyle()),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Container(
-                  width: double.infinity,
-                  child: Text(
-                      'Введите имя и номер телефона, чтобы зарегистрироваться и продолжить оформление заказа',
-                      overflow: TextOverflow.clip)),
-            ),
-            SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.person),
-                    labelText: 'Имя',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16))),
+    if(model.userPhoneNumber != null){
+      return Center(child: Text('Номер: ${model.userPhoneNumber}'));
+    }else{
+      return SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
+                    children: [
+                      Container(
+                          width: 200,
+                          child: Image.asset('assets/pizza_logo.png')),
+                      SizedBox(height: 15),
+                      Text('Вход', style: titleStyle()),
+                      Text('Пользователь: ${model.userPhoneNumber}'),
+                    ],
+                  ),
+                ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                controller: model._phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.phone),
-                    labelText: 'Номер телефона',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16))),
+              SizedBox(height: 15),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Container(
+                    width: double.infinity,
+                    child: Text(
+                        'Введите имя и номер телефона, чтобы зарегистрироваться и продолжить оформление заказа',
+                        overflow: TextOverflow.clip)),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(8.0),
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  final phone = model._phoneController.text.trim();
-                  model.signInWithPhone(phone, context);
-                },
-                child: Text('Войти'),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.orange),
-                  padding: MaterialStateProperty.all(
-                      EdgeInsets.fromLTRB(40, 12, 40, 12)),
+              SizedBox(height: 15),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.person),
+                      labelText: 'Имя',
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16))),
                 ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: model._phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.phone),
+                      labelText: 'Номер телефона',
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16))),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    final phone = model._phoneController.text.trim();
+                    model.signInWithPhone(phone, context);
+                  },
+                  child: Text('Войти'),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.orange),
+                    padding: MaterialStateProperty.all(
+                        EdgeInsets.fromLTRB(40, 12, 40, 12)),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 }
 
