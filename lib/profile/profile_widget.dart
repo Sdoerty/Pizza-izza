@@ -6,6 +6,7 @@ import '../style/style.dart';
 class ProfileModel extends ChangeNotifier{
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _phoneController = TextEditingController();
+  final _codeController = TextEditingController();
 
   Future<String?> signInWithPhone(String phone, BuildContext context) async {
     await _auth.verifyPhoneNumber(
@@ -27,9 +28,43 @@ class ProfileModel extends ChangeNotifier{
         }
       },
       codeSent: (String verificationId, int? resendToken) async {
-        String smsCode = 'xxxx';
-        PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: smsCode);
-        await _auth.signInWithCredential(credential);
+        showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return AlertDialog(
+                title: Text("Give the code?"),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    TextField(
+                      controller: _codeController,
+                    ),
+                  ],
+                ),
+                actions: <Widget>[
+                  ElevatedButton(
+                    child: Text("Confirm"),
+                    onPressed: () async{
+                      final code = _codeController.text.trim();
+                      AuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: code);
+
+                      UserCredential result = await _auth.signInWithCredential(credential);
+
+                      User? user = result.user;
+
+                      if(user != null){
+                        Navigator.of(context).pop();
+                        print(user.phoneNumber);
+                      }else{
+                        print("Error");
+                      }
+                    },
+                  )
+                ],
+              );
+            }
+        );
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
     );
