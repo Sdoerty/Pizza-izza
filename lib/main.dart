@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'menu/menu_widget.dart';
-import 'profile/profile_widget.dart';
+import 'profile/signin_widget.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +41,7 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
           alignment: Alignment.center,
           child: const Text('Корзина'),
         ),
-        SafeArea(child: ProfileWidget())
+        SafeArea(child: SignIn())
       ][currentPageIndex],
       bottomNavigationBar: NavigationBar(
         backgroundColor: Colors.white,
