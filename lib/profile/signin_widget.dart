@@ -118,8 +118,7 @@ class _SignInState extends State<SignIn> {
     });
   }
 
-  Padding signInScreen()
-  {
+  Padding signInScreen() {
     return Padding(
       padding: EdgeInsets.fromLTRB(25, 1, 25, 20),
       child: Form(
@@ -165,7 +164,7 @@ class _SignInState extends State<SignIn> {
                 ignoreBlank: false,
                 autoValidateMode: AutovalidateMode.disabled,
                 selectorTextStyle: TextStyle(color: Colors.black),
-                initialValue: PhoneNumber(isoCode: 'IN'),
+                initialValue: PhoneNumber(isoCode: WidgetsBinding.instance.window.locale.countryCode),
                 formatInput: false,
                 keyboardType:
                 TextInputType.numberWithOptions(signed: true, decimal: true),
@@ -373,6 +372,7 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           showOtpScreen ? otpScreen() : signInScreen(),
